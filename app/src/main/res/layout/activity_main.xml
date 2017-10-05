@@ -1,0 +1,63 @@
+<com.mxn.soul.flowingdrawer_core.FlowingDrawer
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/drawerlayout"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:clipChildren="false"
+	android:clipToPadding="false"
+	app:edPosition="1"
+	app:edMenuSize="260dp"
+	app:edMenuBackground="#dddddd">
+
+	<!--content-->
+	<RelativeLayout
+		android:id="@+id/content"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+		<com.netatmo.ylu.draggablegridview.view.DraggableGridView
+			android:layout_width="400dp"
+			android:layout_height="400dp"
+			android:background="@color/colorAccent"
+			android:id="@+id/draggable">
+			<TextView
+				android:id="@+id/test1"
+				android:layout_width="200dp"
+				android:layout_height="200dp"
+				android:background="@color/cardview_dark_background"
+				android:text="TAG"
+				/>
+<!--			<Button
+				android:id="@+id/button2"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Button"
+				/>-->
+		</com.netatmo.ylu.draggablegridview.view.DraggableGridView>
+
+
+		<!--		<GridView
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:id="@+id/grid_view"
+					android:numColumns="auto_fit"
+					/>-->
+		</RelativeLayout>
+
+	<!--menu-->
+	<com.mxn.soul.flowingdrawer_core.FlowingMenuLayout
+		android:id="@+id/menulayout"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+
+
+			<android.support.v7.widget.RecyclerView
+				android:id="@+id/id_recyclerview"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+
+				/>
+
+	</com.mxn.soul.flowingdrawer_core.FlowingMenuLayout>
+
+</com.mxn.soul.flowingdrawer_core.FlowingDrawer>

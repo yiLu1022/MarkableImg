@@ -3,25 +3,46 @@ package com.netatmo.ylu.draggablegridview.view;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
-import static android.view.View.MeasureSpec.AT_MOST;
-import static android.view.View.MeasureSpec.EXACTLY;
-import static android.view.View.MeasureSpec.UNSPECIFIED;
+public class DraggableGridView extends ViewGroup{
 
-public class DraggableGridView extends ViewGroup implements View.OnTouchListener{
+    private boolean longClickEnabled, holding;
+    private int lastX = -1,  lastY = -1;
+    private boolean isMoved;
+    private static final int TOUCH_SLOP = 20;
+    private Runnable longClickRunnable;
+    private OnLongClickListener longClickListener;
+    private View movableView;
 
-    private boolean enabled, touching;
-    private int x = -1,  y = -1;
-
+    public DraggableGridView(final Context context) {
+        super(context);
+        init();
+    }
 
     public DraggableGridView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
-        setOnTouchListener(this);
+        init();
+    }
+
+    private void init(){
+        longClickRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if(!isMoved && longClickListener!= null &&  holding) {
+                    Log.v("DraggableGridView","LongClick");
+                    longClickEnabled = true;
+                    longClickListener.onLongClick(DraggableGridView.this);
+                }
+            }
+        };
+    }
+
+    public void setLongClickListener(OnLongClickListener listener){
+        this.longClickListener = listener;
     }
 
     @Override
@@ -86,10 +107,19 @@ public class DraggableGridView extends ViewGroup implements View.OnTouchListener
 
     }*/
 
+
+    public int getLastX(){
+        return this.lastX;
+    }
+
+    public int getLastY(){
+        return this.lastY;
+    }
+/*
     @Override
     public boolean onTouch(final View v, final MotionEvent event) {
 
-        switch (event.getAction() & MotionEvent.ACTION_MASK) {
+       switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 x = (int) event.getX();
                 y = (int) event.getY();
@@ -105,18 +135,76 @@ public class DraggableGridView extends ViewGroup implements View.OnTouchListener
                 break;
             case MotionEvent.ACTION_UP:
                 break;
-        }
+
         return false;
     }
+}*/
+
 
 
     @Override
-    public Object clone(){
-        try {
-            return super.clone();
+    public boolean onInterceptTouchEvent(MotionEvent event){
+        switch (event.getAction() & MotionEvent.ACTION_MASK){
+            case MotionEvent.ACTION_DOWN:
+                return false;
+            case MotionEvent.ACTION_MOVE:
+                if(!longClickEnabled){
+                    return false;
+                }else {
+                    return true;
+                }
+            default: return true;
         }
-        catch (CloneNotSupportedException e) {
-            return null;
+    }
+
+    //override onTouchEvent will not work if embeded by a recycleview,
+    //maybe because the event has been consumed by onTouchEvent in recycleview.
+    //so I have to override onInterceptTouchEvent to cooperate with this method
+    @Override
+    public boolean onTouchEvent(final MotionEvent event) {
+        int x = (int) event.getX();
+        int y = (int) event.getY();
+
+        switch (event.getAction() & MotionEvent.ACTION_MASK){
+
+            case MotionEvent.ACTION_UP:
+
+                if(longClickEnabled && longClickListener != null){
+                    Log.v("DraggableGridView","LongClickReleased");
+                    longClickListener.onReleased(this);
+                }
+                holding = false;
+                isMoved = false;
+                longClickEnabled = false;
+                break;
+            case MotionEvent.ACTION_DOWN:
+                lastX = x;
+                lastY = y;
+                holding = true;
+                postDelayed(longClickRunnable, ViewConfiguration.getLongPressTimeout());
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if(isMoved && longClickEnabled){
+                    longClickListener.onMoved(this,x,y);
+                    break;
+                }
+                if(Math.abs(lastX-x)> TOUCH_SLOP || Math.abs(lastY - y) > TOUCH_SLOP){
+                    holding = false;
+                    //Not a ACTION_MOVE after long click
+                    if(longClickEnabled){
+                        isMoved = true;
+                    }
+                }
+                break;
+
+
         }
+        return true;
+    }
+
+    public interface OnLongClickListener {
+        boolean onReleased(DraggableGridView view);
+        boolean onLongClick(DraggableGridView view);
+        boolean onMoved(DraggableGridView view,int rawX, int rawY);
     }
 }

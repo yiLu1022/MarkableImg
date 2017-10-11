@@ -4,8 +4,10 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.netatmo.ylu.draggablegridview.view.DraggableGridView;
@@ -21,56 +23,59 @@ public class MenuAdapter extends RecyclerView.Adapter <MenuAdapter.TagHolder>{
     private final LayoutInflater mLayoutInflater;
     private final Context mContext;
     private ArrayList<String> data;
-    private LongClickCallback longClickCallback;
+    private int lastDownPosition;
+
 
     public MenuAdapter(final Context mContext) {
         this.mContext = mContext;
         mLayoutInflater = LayoutInflater.from(mContext);
     }
 
-    public void setData(ArrayList<String> data){
-        this.data = data;
+    public int getLastDownPosition() {
+        return lastDownPosition;
     }
 
-    public void setLongClickListener(LongClickCallback clickListener){
-        this.longClickCallback = clickListener;
+    public void setData(ArrayList<String> data){
+        this.data = data;
     }
 
     @Override
     public TagHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
         View layout = mLayoutInflater.inflate(R.layout.item_text,parent,false);
-        layout.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(final View v) {
-                Log.e("TAG","TAG");
-                longClickCallback.onLongClick((DraggableGridView)v);
-                return false;
-            }
-        });
 
         return new TagHolder(layout);
     }
 
     @Override
     public void onBindViewHolder(final TagHolder holder, final int position) {
+        holder.position = position;
         holder.textView.setText(data.get(position));
+
     }
 
     @Override
     public int getItemCount() {
         return data.size();
     }
-    public static class TagHolder extends  RecyclerView.ViewHolder{
+
+
+    class TagHolder extends  RecyclerView.ViewHolder implements View.OnTouchListener{
+
         @BindView(R.id.textView)
         TextView textView;
+        int position;
 
-        public TagHolder(final View itemView) {
+        TagHolder(final View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);
+            itemView.setOnTouchListener(this);
         }
-    }
 
-    public interface LongClickCallback{
-        void onLongClick(DraggableGridView view);
+        @Override
+        public boolean onTouch(final View v, final MotionEvent event) {
+            Log.e("MenuAdapter","onTouch");
+            MenuAdapter.this.lastDownPosition = position;
+            return false;
+        }
     }
 }

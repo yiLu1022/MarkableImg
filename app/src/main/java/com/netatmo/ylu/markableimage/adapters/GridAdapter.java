@@ -1,6 +1,7 @@
 package com.netatmo.ylu.markableimage.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -64,7 +65,7 @@ public class GridAdapter extends BaseAdapter implements View.OnTouchListener{
         loader.load(data.get(position).getPath(),holder.imageView);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.leftMargin = 50;
+        layoutParams.rightMargin = 50;
         layoutParams.topMargin = 50;
         convertView.setLayoutParams(layoutParams);
         convertView.setOnTouchListener(this);
@@ -77,6 +78,28 @@ public class GridAdapter extends BaseAdapter implements View.OnTouchListener{
 
 
     @Override
+    public boolean onTouch(final View v, final MotionEvent event) {
+        final int rawX = (int) event.getRawX();
+        final int rawY = (int) event.getRawY();
+        final int left = v.getLeft();
+        final int right = v.getRight();
+        final int top = v.getTop();
+        final int bottom = v.getBottom();
+
+        switch (event.getAction() & MotionEvent.ACTION_MASK) {
+            case MotionEvent.ACTION_MOVE:
+                if(rawX<right && rawX>left && rawY<bottom && rawY > top){
+                    Log.e("GridAdapter","命中");
+                }
+                break;
+        }
+
+        return false;
+    }
+
+
+    //移动图片的onTouch
+/*    @Override
     public boolean onTouch(final View v, final MotionEvent event) {
         final int x = (int) event.getRawX();
         final int y = (int) event.getRawY();
@@ -101,5 +124,5 @@ public class GridAdapter extends BaseAdapter implements View.OnTouchListener{
         }
         //mViewGroup.invalidate();
         return true;
-    }
+    }*/
 }

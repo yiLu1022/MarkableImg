@@ -1,20 +1,26 @@
 package com.netatmo.ylu.markableimage;
 
+import android.content.Context;
 import android.graphics.Color;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mxn.soul.flowingdrawer_core.ElasticDrawer;
 import com.mxn.soul.flowingdrawer_core.FlowingDrawer;
+import com.netatmo.ylu.draggablegridview.view.DragRelativeLayout;
 import com.netatmo.ylu.draggablegridview.view.DraggableRecyclerView;
 import com.netatmo.ylu.markableimage.adapters.GridAdapter;
 import com.netatmo.ylu.markableimage.adapters.MenuAdapter;
@@ -33,59 +39,24 @@ public class MainActivity extends AppCompatActivity {
     DraggableRecyclerView recyclerView;
     @BindView(R.id.photo_grid)
     GridView gridView;
-
-
+    @BindView(R.id.content)
+    DragRelativeLayout relativeLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final RelativeLayout layout = (RelativeLayout)findViewById(R.id.content) ;
         ButterKnife.bind(this);
-
         ArrayList<String> list = new ArrayList<>();
         for(int i=0;i<60;i++){
             list.add("item " + String.valueOf(i));
         }
         final Button btn = new Button(MainActivity.this);
-
-
+        btn.setText("GO!GO!GO");
+        relativeLayout.setTagView(btn);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         final MenuAdapter adapter = new MenuAdapter(getApplicationContext());
         adapter.setData(list);
-
-        recyclerView.setLongClickListener(new DraggableRecyclerView.OnLongClickListener() {
-            @Override
-            public boolean onReleased(final DraggableRecyclerView view,int rawX,int rawY) {
-
-                Log.v("MainActivity","onReleased");
-                layout.removeView(btn);
-                return false;
-            }
-
-            @Override
-            public boolean onLongClick(final DraggableRecyclerView view) {
-                Log.v("MainActivity","onLongClick");
-                btn.setText(String.valueOf(adapter.getLastDownPosition()));
-                int x =  view.getLastX();
-                int y =  view.getLastY();
-                addButton(btn,x,y,layout);
-                return false;
-            }
-
-            @Override
-            public boolean onMoved(final DraggableRecyclerView view, final int rawX, final int rawY) {
-                Log.v("MainActivity","onMove");
-                for(int i = 0;i <layout.getChildCount(); i++) {
-                    View child = layout.getChildAt(i);
-                    if(child instanceof Button){
-                        child.layout(rawX,rawY,rawX + child.getWidth(), rawY + child.getHeight());
-                    }
-                }
-                return false;
-            }
-        });
-
 
         recyclerView.setAdapter(adapter);
         mDrawer.setTouchMode(ElasticDrawer.TOUCH_MODE_BEZEL);
@@ -110,19 +81,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         showPics();
-    }
-
-
-    public void addButton(View view,int x, int y,ViewGroup layout){
-
-        view.setBackgroundColor(Color.GRAY) ;
-        RelativeLayout.LayoutParams btn_params = new RelativeLayout.LayoutParams
-                (RelativeLayout.LayoutParams.WRAP_CONTENT,
-                 RelativeLayout.LayoutParams.WRAP_CONTENT);
-        btn_params.setMargins(x,y,0,0);
-
-        view.setLayoutParams(btn_params);
-        layout.addView(view);
     }
 
     public void showPics(){

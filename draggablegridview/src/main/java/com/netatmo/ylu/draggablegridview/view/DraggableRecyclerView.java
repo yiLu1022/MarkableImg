@@ -12,8 +12,12 @@ import android.view.ViewConfiguration;
 public class DraggableRecyclerView extends RecyclerView implements View.OnTouchListener{
 
     private boolean longClickEnabled, holding;
+    private int draggableIndex = -1;
     private int lastX = -1,  lastY = -1;
     private static final int TOUCH_SLOP = 20;
+    private int itemHeight,itemWidth;
+    private static final int DEFAULT_ITEM_WIDTH = 50;
+    private static final int DEFAULT_ITEM_HEIGHT = 55;
     private int count ;
     private boolean isMoved;
     private Runnable longClickRunnable;
@@ -52,9 +56,23 @@ public class DraggableRecyclerView extends RecyclerView implements View.OnTouchL
                 }
             }
         };
+
         setOnTouchListener(this);
     }
 
+    private void initByDefault(){
+        itemHeight = DEFAULT_ITEM_HEIGHT;
+        itemWidth = DEFAULT_ITEM_WIDTH;
+    }
+
+    private int getIndex(){
+        return getIndexByCoorX(lastX);
+    }
+
+    private int getIndexByCoorX(int x){
+        //TODO & log
+        return 0;
+    }
 
     public void setLongClickListener(OnLongClickListener listener){
         this.longClickListener = listener;
@@ -96,8 +114,7 @@ public class DraggableRecyclerView extends RecyclerView implements View.OnTouchL
             case MotionEvent.ACTION_MOVE:
 
                 if(isMoved && longClickEnabled){
-                    longClickListener.onMoved(this,x,y);
-                    return true;
+                    return longClickListener.onMoved(this,x,y);
                 }
                 if(Math.abs(lastX-x)> TOUCH_SLOP || Math.abs(lastY - y) > TOUCH_SLOP){
                     isMoved = true;

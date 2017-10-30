@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -85,7 +86,6 @@ public class GridAdapter extends BaseAdapter implements View.OnTouchListener{
         final int right = v.getRight();
         final int top = v.getTop();
         final int bottom = v.getBottom();
-
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_MOVE:
                 if(rawX<right && rawX>left && rawY<bottom && rawY > top){

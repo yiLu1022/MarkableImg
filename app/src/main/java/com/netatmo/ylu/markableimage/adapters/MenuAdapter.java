@@ -7,10 +7,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.netatmo.ylu.draggablegridview.view.DraggableGridView;
 import com.netatmo.ylu.markableimage.R;
 
 import java.util.ArrayList;
